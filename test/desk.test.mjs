@@ -166,3 +166,16 @@ test('market labels are specific and decided markets are dropped', async () => {
   assert.equal(toMarket({ ...base, id: 3, outcomes: '["Over","Under"]', question: 'Games Total: O/U 2.5' }).label, 'Total O/U 2.5')
   assert.equal(toMarket({ ...base, id: 4, outcomePrices: '["1","0"]', question: 'x' }), null)
 })
+
+test('handicaps are named, duplicates and thin markets dropped', async () => {
+  const { toMarket, toContext } = await import('../server/polymarket.mjs')
+  const base = { outcomes: '["PVISION","Lynn Vision"]', clobTokenIds: '["1","2"]', enableOrderBook: true, outcomePrices: '["0.6","0.4"]' }
+  assert.equal(toMarket({ ...base, id: 1, question: 'Map Handicap: PVISION (-1.5) vs Lynn Vision (+1.5)' }).label, 'Handicap PVISION -1.5')
+  assert.equal(toMarket({ ...base, id: 2, question: 'x', bestBid: '0.3', bestAsk: '0.6' }), null)
+  const c = toContext({ id: 9, title: 'T', markets: [
+    { ...base, id: 3, question: 'A vs B', groupItemTitle: 'Match Winner', sportsMarketType: 'moneyline', volumeNum: 5 },
+    { ...base, id: 4, question: 'A vs B', sportsMarketType: 'moneyline', volumeNum: 1 },
+    { ...base, id: 5, question: 'A vs B - Map 1 Winner' },
+  ] }, 'game')
+  assert.deepEqual(c.markets.map((m) => m.label), ['Match Winner', 'Map 1 Winner'])
+})

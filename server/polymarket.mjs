@@ -34,6 +34,8 @@ export function marketLabel(m, outcomes, yesNo) {
   if (yesNo) return group || q
   if (group && !/ vs\.? /i.test(group)) return group
   if (tail && !/ vs\.? /i.test(tail)) return tail
+  const hc = q.match(/\(([-+]\d+(?:\.\d+)?)\)/)
+  if (hc || m.sportsMarketType === 'spreads') return hc ? `Handicap ${outcomes[0]} ${hc[1]}` : 'Handicap'
   if (/o\/u|over|under/i.test(q) || /^over$/i.test(outcomes[0])) {
     const line = q.match(/(\d+(?:\.\d+)?)/)
     return line ? `Total O/U ${line[1]}` : 'Total'
@@ -50,6 +52,9 @@ export function toMarket(m) {
   if (m.acceptingOrders === false || m.active === false) return null
   // already decided (99¢+ / 1¢-): nothing left to watch or trade
   if (prices.length === 2 && Math.max(...prices) >= 0.985) return null
+  // too thin to trade honestly (more than 10 points between buy and sell)
+  const spread = num(m.spread) ?? (num(m.bestAsk) != null && num(m.bestBid) != null ? num(m.bestAsk) - num(m.bestBid) : null)
+  if (spread != null && spread > 0.1) return null
   const yesNo = /^yes$/i.test(outcomes[0])
   const label = marketLabel(m, outcomes, yesNo)
   return {
@@ -73,7 +78,16 @@ export function toMarket(m) {
 function rank(markets) {
   // money-line style markets first, then by volume
   const pri = (m) => (m.type === 'moneyline' ? 0 : m.type ? 2 : 1)
-  return markets.filter(Boolean).sort((a, b) => pri(a) - pri(b) || b.volume - a.volume)
+  const seen = new Set()
+  return markets
+    .filter(Boolean)
+    .sort((a, b) => pri(a) - pri(b) || b.volume - a.volume)
+    .filter((m) => {
+      const k = m.label.toLowerCase()
+      if (seen.has(k)) return false
+      seen.add(k)
+      return true
+    })
 }
 
 export function toContext(e, kind) {
