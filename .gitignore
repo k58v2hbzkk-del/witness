@@ -1,0 +1,6 @@
+node_modules
+glasses/node_modules
+glasses/dist
+data
+*.ehpk
+.env*

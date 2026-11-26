@@ -1,0 +1,13 @@
+{
+  "package_id": "com.tajudeen.witness",
+  "edition": "202601",
+  "name": "Witness",
+  "version": "0.1.0",
+  "min_app_version": "2.0.0",
+  "min_sdk_version": "0.0.12",
+  "entrypoint": "index.html",
+  "permissions": [
+    { "name": "network", "desc": "Reads live Polymarket prices and game scores through the Witness server and places paper trades.", "whitelist": ["https://witness.onrender.com"] }
+  ],
+  "supported_languages": ["en"]
+}
