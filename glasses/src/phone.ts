@@ -95,8 +95,9 @@ function listing(items: Listing[], title: string) {
     (items.length
       ? items
           .map((i) => {
-            const when = i.start ? new Date(i.start).toLocaleString([], { weekday: 'short', hour: '2-digit', minute: '2-digit' }) : ''
-            return `<button data-watch="${esc(i.id)}">${esc(i.title)}<small>${i.kind === 'replay' ? 'REPLAY · simulated data' : `${esc(when)}${i.markets ? ` · ${i.markets} markets` : ''}`}</small></button>`
+            const t = i.start ? Date.parse(i.start) : NaN
+            const when = !Number.isFinite(t) ? '' : t <= Date.now() ? '● LIVE NOW' : `Starts ${new Date(t).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+            return `<button data-watch="${esc(i.id)}">${esc(i.title)}<small>${i.kind === 'replay' ? 'REPLAY · simulated data' : `${esc(when)}${i.markets ? ` · ${i.markets} market${i.markets > 1 ? 's' : ''}` : ''}`}</small></button>`
           })
           .join('')
       : '<p class="note">Nothing tradable found.</p>')

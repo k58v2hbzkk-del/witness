@@ -62,7 +62,7 @@ export function toContext(e, kind) {
   return {
     id: String(e.id),
     kind,
-    title: e.title,
+    title: String(e.title || '').replace(/\s+-\s+More Markets$/i, ''),
     slug: e.slug,
     start,
     volume24h: Number(e.volume24hr || 0),
