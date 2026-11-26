@@ -15,7 +15,7 @@ export type MarketView = {
 export type Context = { id: string; kind: string; title: string; url: string | null; replay: boolean; markets: MarketView[] }
 export type Game = { home: string; away: string; score: string; period: string; elapsed: string; live: boolean; ended: boolean; status: string; replay: boolean }
 export type Moment = { id: number; at: number; type: 'watch' | 'score' | 'event' | 'swing'; text: string; marketId: string | null }
-export type Edge = { status: 'watching' | 'followed' | 'not_followed'; seconds?: number; move?: number; beatDelay?: boolean }
+export type Edge = { status: 'watching' | 'void' | 'followed' | 'not_followed'; seconds?: number; move?: number; beatDelay?: boolean }
 export type Trade = {
   id: string
   marketId: string
