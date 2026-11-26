@@ -222,6 +222,19 @@ export class SportsFeed {
 
 const norm = (s) => String(s || '').toLowerCase().replace(/[^a-z0-9 ]/g, ' ').replace(/\b(fc|cf|afc|sc|the|club|de|united|city)\b/g, ' ').replace(/\s+/g, ' ').trim()
 
+/**
+ * Sports-feed scores come as "2-1" for most games, but esports send "rounds|maps|format",
+ * e.g. "013-010|1-0|Bo3". Returns the headline score plus a short detail line.
+ */
+export function splitScore(raw, period) {
+  const s = String(raw || '')
+  if (!s.includes('|')) return { score: s, detail: null, kind: 'score' }
+  const [rounds, maps] = s.split('|')
+  const r = (rounds || '').split('-').map((x) => Number(x) || 0)
+  const map = period && /^\d+\/\d+$/.test(period) ? `Map ${period}` : 'Map'
+  return { score: maps || '0-0', detail: `${map} · ${r[0] ?? 0}–${r[1] ?? 0}`, kind: 'map' }
+}
+
 /** Does this live game belong to this event? Matched on team names in the event title. */
 export function gameMatches(game, title) {
   const t = ` ${norm(title)} `

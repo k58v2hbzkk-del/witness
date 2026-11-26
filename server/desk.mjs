@@ -1,7 +1,7 @@
 // The desk: what you are watching, the live prices for it, and a paper account that trades it
 // under Polymarket's real rules (sports orders wait out the market's secondsDelay).
 
-import { gameMatches } from './polymarket.mjs'
+import { splitScore, gameMatches } from './polymarket.mjs'
 
 export const START_CASH = 1000
 export const STAKES = [5, 10, 25, 50]
@@ -90,10 +90,11 @@ export class Desk {
     const mine = g.replay ? this.context.replay && g.gameId === this.context.id : gameMatches(g, this.context.title)
     if (!mine) return
     const before = this.game
-    this.game = { home: g.homeTeam, away: g.awayTeam, score: g.score, period: g.period, elapsed: g.elapsed, live: g.live, ended: g.ended, status: g.status, replay: !!g.replay }
-    if (before && before.score !== g.score) {
-      if (g.score === '0-0') this.moment('event', 'KICK-OFF', null)
-      else this.moment('score', g.what || `SCORE ${g.homeTeam} ${g.score} ${g.awayTeam}`, null)
+    const sc = splitScore(g.score, g.period)
+    this.game = { home: g.homeTeam, away: g.awayTeam, score: sc.score, period: g.period, elapsed: sc.detail || g.elapsed, live: g.live, ended: g.ended, status: g.status, replay: !!g.replay }
+    if (before && before.score !== sc.score) {
+      if (sc.score === '0-0') this.moment('event', 'KICK-OFF', null)
+      else this.moment('score', g.what || `${sc.kind === 'map' ? 'MAP' : 'SCORE'} ${g.homeTeam} ${sc.score} ${g.awayTeam}`, null)
       this.lastWhat = g.what
     } else if (g.what && this.lastWhat !== g.what) {
       this.moment('event', g.what, null)

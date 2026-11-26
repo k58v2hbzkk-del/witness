@@ -179,3 +179,9 @@ test('handicaps are named, duplicates and thin markets dropped', async () => {
   ] }, 'game')
   assert.deepEqual(c.markets.map((m) => m.label), ['Match Winner', 'Map 1 Winner'])
 })
+
+test('esports scores show maps, with rounds as detail', async () => {
+  const { splitScore } = await import('../server/polymarket.mjs')
+  assert.deepEqual(splitScore('013-010|1-0|Bo3', '2/3'), { score: '1-0', detail: 'Map 2/3 · 13–10', kind: 'map' })
+  assert.equal(splitScore('2-1').score, '2-1')
+})
