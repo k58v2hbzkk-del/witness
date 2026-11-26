@@ -93,7 +93,11 @@ export class Desk {
     const sc = splitScore(g.score, g.period)
     this.game = { home: g.homeTeam, away: g.awayTeam, score: sc.score, period: g.period, elapsed: sc.detail || g.elapsed, live: g.live, ended: g.ended, status: g.status, replay: !!g.replay }
     if (before && before.score !== sc.score) {
-      if (sc.score === '0-0') this.moment('event', 'KICK-OFF', null)
+      if (sc.score === '0-0') {
+        // a replay starting over: anything still open belongs to the last run
+        if (g.replay) this.restart()
+        this.moment('event', 'KICK-OFF', null)
+      }
       else this.moment('score', g.what || `${sc.kind === 'map' ? 'MAP' : 'SCORE'} ${g.homeTeam} ${sc.score} ${g.awayTeam}`, null)
       this.lastWhat = g.what
     } else if (g.what && this.lastWhat !== g.what) {
@@ -147,6 +151,8 @@ export class Desk {
     const q = this.quotes.get(m.tokens[side])
     if (!q || q.ask == null) throw new Error('no price yet')
     if (q.ask >= 0.99) throw new Error('nothing left to win at 99¢')
+    if (q.ask <= 0.02) throw new Error('this market is all but settled')
+    if (this.game?.ended) throw new Error('the game is over')
     const reserved = this.pending.reduce((s, p) => s + p.usd, 0)
     if (this.cash - reserved < this.stake) throw new Error('not enough paper cash')
     const now = this.now()
@@ -168,6 +174,13 @@ export class Desk {
     this.emit('pending', t)
     this.tick()
     return t
+  }
+
+  /** The replay looped back to kick-off: cancel waiting orders and stop scoring old taps. */
+  restart() {
+    for (const t of this.pending.splice(0)) this.emit('cancelled', t)
+    for (const p of this.positions) if (p.edge?.status === 'watching') p.edge = { status: 'void' }
+    for (const m of this.context?.markets || []) for (const tk of m.tokens) this.history.set(tk, [])
   }
 
   cancel(id) {

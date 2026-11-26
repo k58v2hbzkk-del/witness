@@ -97,7 +97,7 @@ function positions(): [string, string, string] {
   const p = list[cursor]
   const e = p.edge
   const edge =
-    e.status === 'followed' ? `● market followed ${pts(e.move ?? 0)} pts after ${e.seconds}s` : e.status === 'not_followed' ? '○ market did not follow' : '… watching the market'
+    e.status === 'followed' ? `● market followed ${pts(e.move ?? 0)} pts after ${e.seconds}s` : e.status === 'not_followed' ? '○ market did not follow' : e.status === 'void' ? '○ not scored (replay restarted)' : '… watching the market'
   const body = `${p.sideName} · ${cap(p.label, 30)}\nin at ${cents(p.fillPrice)} (tapped ${cents(p.tapAsk)})\nnow ${usd(p.value)}  ${signed(p.pnl)}\n${edge}`
   return [head, body, `${cursor + 1}/${slots}  tap: sell  double-tap: back`]
 }

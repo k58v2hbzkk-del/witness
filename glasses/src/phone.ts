@@ -188,7 +188,7 @@ export function setPhoneState(s: State) {
     ...s.pending.map((t) => `<div class="pos"><div class="l"><span>◆ ${esc(t.sideName)} · ${esc(t.label)}</span><button data-cancel="${esc(t.id)}">Cancel · ${t.fillsIn ?? 0}s</button></div><small>$${t.usd} · tapped at ${cents(t.tapAsk)} · waiting out the ${t.delay}s delay</small></div>`),
     ...s.positions.map((p) => {
       const e = p.edge
-      const edge = e.status === 'followed' ? `⚡ market followed: ${pts(e.move ?? 0)} pts after ${e.seconds}s` : e.status === 'not_followed' ? '○ market did not follow' : '… watching the market'
+      const edge = e.status === 'followed' ? `⚡ market followed: ${pts(e.move ?? 0)} pts after ${e.seconds}s` : e.status === 'not_followed' ? '○ market did not follow' : e.status === 'void' ? '○ not scored (replay restarted)' : '… watching the market'
       return `<div class="pos"><div class="l"><span>${esc(p.sideName)} · ${esc(p.label)}</span><span class="pnl ${p.pnl >= 0 ? 'u' : 'd'}">${signed(p.pnl)}</span></div><small>in ${cents(p.fillPrice)} (tapped ${cents(p.tapAsk)}) · now ${usd(p.value)} · ${edge}</small><button data-close="${esc(p.id)}" style="margin-top:7px">Sell</button></div>`
     }),
   ]

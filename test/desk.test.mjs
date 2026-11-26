@@ -185,3 +185,13 @@ test('esports scores show maps, with rounds as detail', async () => {
   assert.deepEqual(splitScore('013-010|1-0|Bo3', '2/3'), { score: '1-0', detail: 'Map 2/3 · 13–10', kind: 'map' })
   assert.equal(splitScore('2-1').score, '2-1')
 })
+
+test('no trades after full time or on settled prices; replay restart voids old taps', () => {
+  const { desk } = setup()
+  const tok = desk.context.markets[0].tokens[0]
+  desk.quote(tok, { bid: 0.005, ask: 0.015 })
+  assert.throws(() => desk.trade(desk.context.markets[0].id, 0), /settled/)
+  desk.game_({ gameId: desk.context.id, homeTeam: 'Northgate', awayTeam: 'Ashford Rovers', score: '1-1', ended: true, replay: true })
+  desk.quote(tok, { bid: 0.4, ask: 0.42 })
+  assert.throws(() => desk.trade(desk.context.markets[0].id, 0), /over/)
+})
