@@ -8,7 +8,7 @@ there see it before the market moves. One gesture on the glasses backs what you 
 
 Built for **Heads Up: Even Realities Hackathon** (DoraHacks, TVM Ventures × Daos Hub), **Track 02 · Crypto & DeFi** (Polymarket).
 
-- Live: https://witness.onrender.com (website) · https://witness.onrender.com/app/ (glasses + phone app)
+- Live: https://witness-rjya.onrender.com (website) · https://witness-rjya.onrender.com/app/ (glasses + phone app)
 - Paper trading only, on live public Polymarket data. No wallet, no keys, no custody.
 
 ## Why glasses
