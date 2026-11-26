@@ -157,3 +157,12 @@ test('a game event is announced once', () => {
   desk.game_({ ...g, what: 'RED CARD Northgate' })
   assert.equal(desk.moments.filter((m) => m.text === 'RED CARD Northgate').length, 1)
 })
+
+test('market labels are specific and decided markets are dropped', async () => {
+  const { toMarket } = await import('../server/polymarket.mjs')
+  const base = { outcomes: '["Heroic","FaZe"]', clobTokenIds: '["1","2"]', enableOrderBook: true, outcomePrices: '["0.6","0.4"]' }
+  assert.equal(toMarket({ ...base, id: 1, question: 'Counter-Strike: Heroic vs FaZe - Map 1 Winner' }).label, 'Map 1 Winner')
+  assert.equal(toMarket({ ...base, id: 2, question: 'Counter-Strike: Heroic vs FaZe (BO3)', sportsMarketType: 'moneyline' }).label, 'Match winner')
+  assert.equal(toMarket({ ...base, id: 3, outcomes: '["Over","Under"]', question: 'Games Total: O/U 2.5' }).label, 'Total O/U 2.5')
+  assert.equal(toMarket({ ...base, id: 4, outcomePrices: '["1","0"]', question: 'x' }), null)
+})
