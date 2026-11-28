@@ -68,7 +68,7 @@ while time.time() - t0 < MIN * 60:
         key = (m.get('type'), m.get('text'), m.get('at'))
         if key in seen: continue
         seen.add(key)
-        if m.get('type') in ('score', 'swing', 'event') and len(seen) > 1 and time.time() - last_act > 8:
+        if m.get('type') in ('score', 'swing') and len(seen) > 1 and time.time() - last_act > 30:
             time.sleep(1.8); act('up'); last_act = time.time(); fills.append(time.time())
     if not forced and time.time() - t0 > 45:
         act('up'); forced = True; last_act = time.time(); fills.append(time.time())

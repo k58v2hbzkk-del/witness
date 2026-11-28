@@ -195,3 +195,10 @@ test('no trades after full time or on settled prices; replay restart voids old t
   desk.quote(tok, { bid: 0.4, ask: 0.42 })
   assert.throws(() => desk.trade(desk.context.markets[0].id, 0), /over/)
 })
+
+test('a live game locks to one gameId; shared words like "Esports" do not match', async () => {
+  const { gameMatches } = await import('../server/polymarket.mjs')
+  const title = 'Counter-Strike: FUT Esports vs 100 Thieves (BO1)'
+  assert.equal(gameMatches({ homeTeam: 'GodLike Esports', awayTeam: 'Kryon Esports' }, title), false)
+  assert.equal(gameMatches({ homeTeam: 'FUT Esports', awayTeam: '100 Thieves' }, title), true)
+})

@@ -236,8 +236,15 @@ export function splitScore(raw, period) {
 }
 
 /** Does this live game belong to this event? Matched on team names in the event title. */
+// Words many team names share: matching on them ties a game to the wrong match.
+const GENERIC = new Set('esports esport gaming team club united city town real sporting athletic athletico deportivo calcio academy fc cf sc ac afc cfc fk sk bk if gg the de la los las del'.split(' '))
+
 export function gameMatches(game, title) {
   const t = ` ${norm(title)} `
-  const hit = (team) => norm(team).split(' ').filter((w) => w.length >= 3).some((w) => t.includes(` ${w} `))
+  const hit = (team) =>
+    norm(team)
+      .split(' ')
+      .filter((w) => w.length >= 3 && !GENERIC.has(w))
+      .some((w) => t.includes(` ${w} `))
   return hit(game.homeTeam) && hit(game.awayTeam)
 }

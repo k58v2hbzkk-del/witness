@@ -26,6 +26,7 @@ export class Desk {
     this.quotes = new Map() // token -> {bid, ask, mid, at}
     this.history = new Map() // token -> [{at, mid}]
     this.game = null
+    this.gameId = null
     this.moments = []
     this.focus = 0
     this.stake = 10
@@ -87,8 +88,14 @@ export class Desk {
 
   game_(g) {
     if (!this.context) return
-    const mine = g.replay ? this.context.replay && g.gameId === this.context.id : gameMatches(g, this.context.title)
+    // once a live game is matched, stick to its gameId so a similarly named match can't take over
+    const mine = g.replay
+      ? this.context.replay && g.gameId === this.context.id
+      : this.gameId != null
+        ? g.gameId === this.gameId
+        : gameMatches(g, this.context.title)
     if (!mine) return
+    if (!g.replay) this.gameId = g.gameId
     const before = this.game
     const sc = splitScore(g.score, g.period)
     this.game = { home: g.homeTeam, away: g.awayTeam, score: sc.score, period: g.period, elapsed: sc.detail || g.elapsed, live: g.live, ended: g.ended, status: g.status, replay: !!g.replay }
