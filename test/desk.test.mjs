@@ -202,3 +202,13 @@ test('a live game locks to one gameId; shared words like "Esports" do not match'
   assert.equal(gameMatches({ homeTeam: 'GodLike Esports', awayTeam: 'Kryon Esports' }, title), false)
   assert.equal(gameMatches({ homeTeam: 'FUT Esports', awayTeam: '100 Thieves' }, title), true)
 })
+
+test('switching context forgets the previous live game', () => {
+  const { desk } = setup()
+  desk.context = { ...desk.context, replay: false, title: 'Bristol Rovers vs Tranmere Rovers' }
+  desk.game_({ gameId: 7, homeTeam: 'Bristol Rovers FC', awayTeam: 'Tranmere Rovers FC', score: '0-1' })
+  assert.equal(desk.gameId, 7)
+  desk.setContext({ id: 'x', title: 'Counter-Strike: FlyQuest vs PVISION', markets: [] })
+  desk.game_({ gameId: 7, homeTeam: 'Bristol Rovers FC', awayTeam: 'Tranmere Rovers FC', score: '0-2' })
+  assert.equal(desk.game, null)
+})

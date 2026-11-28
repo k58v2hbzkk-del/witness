@@ -38,7 +38,8 @@ if QUERY:
         pick = (found.get('results') or found if isinstance(found, list) else found.get('results', [None]))[0]
 if not pick:
     soccer = [c for c in live if started(c) and not c['title'].lower().startswith(('counter-strike', 'lol', 'dota', 'valorant'))]
-    pick = (soccer or [c for c in live if started(c)] or live)[0]
+    pool = soccer or [c for c in live if started(c)] or live
+    pick = sorted(pool, key=lambda c: c.get('start') or '')[-1]
 print('context:', pick['title'], pick['id'], flush=True)
 post(f'{BASE}/api/context', {'id': pick['id']})
 post(f'{BASE}/api/reset', {})

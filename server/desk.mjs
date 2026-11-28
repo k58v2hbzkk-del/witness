@@ -42,6 +42,7 @@ export class Desk {
     this.context = ctx
     this.focus = 0
     this.game = null
+    this.gameId = null
     this.moments = []
     for (const m of ctx.markets) this.addMarket(m)
     this.moment('watch', `Watching ${ctx.title}`, null)
