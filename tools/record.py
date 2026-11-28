@@ -56,6 +56,7 @@ threading.Thread(target=shooter, daemon=True).start()
 
 slog = open('state.jsonl', 'w')
 seen, last_act, fills = set(), time.time(), []
+forced = False
 time.sleep(4)
 for k in range(3): act('click'); time.sleep(1.5)
 act('click')  # back to the first market (4 markets max; wraps)
@@ -69,6 +70,8 @@ while time.time() - t0 < MIN * 60:
         seen.add(key)
         if m.get('type') in ('score', 'swing', 'event') and len(seen) > 1 and time.time() - last_act > 8:
             time.sleep(1.8); act('up'); last_act = time.time(); fills.append(time.time())
+    if not forced and time.time() - t0 > 45:
+        act('up'); forced = True; last_act = time.time(); fills.append(time.time())
     if fills and time.time() - fills[0] > 25:
         act('double_click'); time.sleep(5); act('double_click'); fills.pop(0); last_act = time.time()
     if time.time() - last_act > 60:
