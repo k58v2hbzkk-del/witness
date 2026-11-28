@@ -40,7 +40,8 @@ jobs:
               L.append(f"file 'frames/f{i:06d}.png'\nduration {dur:.3f}")
           open('list.txt', 'w').write('\n'.join(L))
           PY
-          ffmpeg -v error -y -f concat -i list.txt -vf "fps=30,scale=1152:576:flags=neighbor,format=yuv420p" -c:v libx264 -crf 14 -preset veryfast glasses-live.mp4
+          ffmpeg -v error -y -f lavfi -i color=c=black:s=576x288:r=30 -f concat -i list.txt -filter_complex "[1:v]fps=30,format=rgba[f];[0:v][f]overlay=shortest=1,scale=1152:576:flags=neighbor,format=yuv420p" -c:v libx264 -crf 14 -preset veryfast glasses-live.mp4
+          tar czf frames.tgz frames
           rm -rf frames list.txt
       - name: save to the recordings branch
         run: |

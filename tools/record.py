@@ -30,7 +30,9 @@ def started(c):
     except Exception: return False
 pick = None
 if QUERY:
-    pick = next((c for c in live if QUERY in c['title'].lower()), None)
+    hits = [c for c in live if QUERY in c['title'].lower()]
+    on = [c for c in hits if started(c)]
+    pick = (sorted(on, key=lambda c: c['start'])[-1] if on else (hits[0] if hits else None))
     if not pick:
         found = json.loads(get(f'{BASE}/api/search?q=' + urllib.parse.quote(QUERY), 60))
         pick = (found.get('results') or found if isinstance(found, list) else found.get('results', [None]))[0]
