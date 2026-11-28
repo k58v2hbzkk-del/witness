@@ -40,11 +40,14 @@ jobs:
               L.append(f"file 'frames/f{i:06d}.png'\nduration {dur:.3f}")
           open('list.txt', 'w').write('\n'.join(L))
           PY
-          ffmpeg -v error -y -f concat -i list.txt -vf "format=rgba,colorkey=0x000000:0.01:0,format=yuv420p,fps=30,scale=1152:576:flags=neighbor" -c:v libx264 -crf 14 -preset veryfast glasses-live.mp4 || ffmpeg -v error -y -f concat -i list.txt -vf "fps=30,scale=1152:576:flags=neighbor,format=yuv420p" -c:v libx264 -crf 14 -preset veryfast glasses-live.mp4
+          ffmpeg -v error -y -f concat -i list.txt -vf "fps=30,scale=1152:576:flags=neighbor,format=yuv420p" -c:v libx264 -crf 14 -preset veryfast glasses-live.mp4
           rm -rf frames list.txt
       - name: save to the recordings branch
         run: |
-          cd rec && cp ../sim.log . || true
+          cp sim.log rec/ || true
           git config user.name rec-bot && git config user.email rec-bot@users.noreply.github.com
-          git checkout --orphan rec-${{ github.run_id }} && git rm -rqf --cached . && git add -f . && git commit -qm "simulator recording ${{ github.run_id }}"
+          git checkout -q --orphan rec-${{ github.run_id }}
+          git rm -rqf --cached .
+          git add -f rec
+          git commit -qm "simulator recording ${{ github.run_id }}"
           git push -q origin HEAD:refs/heads/rec-${{ github.run_id }}
